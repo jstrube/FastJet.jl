@@ -1,5 +1,5 @@
 authors = ["Jan Strube <jan.strube@gmail.com>"]
-name = "Fastjet"
+name = "FastJet"
 uuid = "8509a5d2-ae42-11e8-0b46-5d0ace601ee4"
 version = "0.1.0"
 
