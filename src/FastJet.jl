@@ -1,7 +1,12 @@
 module FastJet
 using CxxWrap
+const depsfile = joinpath(dirname(dirname(@__FILE__)), "deps", "deps.jl")
+if !isfile(depsfile)
+  error("$depsfile not found, CxxWrap did not build properly")
+end
+include(depsfile)
 
-@wrapmodule(joinpath("path/to/built/lib","libhello"))
+@wrapmodule(libfastjetwrap)
 
 function __init__()
     @initcxx
