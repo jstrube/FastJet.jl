@@ -12,4 +12,8 @@ function __init__()
     @initcxx
 end
 
+export PseudoJet, JetDefinition, antikt_algorithm, ClusterSequence, inclusive_jets, sorted_by_pt, pt, rap, phi, constituents
+import Base.length, Base.getindex
+length(v::JetVec) = size(v)
+getindex(v::JetVec, i) = at(v, i-1)
 end # module
