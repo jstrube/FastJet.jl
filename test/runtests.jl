@@ -26,5 +26,6 @@ function main()
         #     println("    constituent ", j, "'s pt: ", pt(constituents[j]))
         # end
     end
+    return cs
 end 
 main() 
