@@ -3,8 +3,9 @@ using CxxWrap # this is needed for opening the dependency lib. Otherwise Libdl.d
 
 ##################### Fastjet ###########################s
 const fjversion = "v3.3.2"
-const verbose = "--verbose" in ARGS
-const prefix = Prefix(get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")))
+const verbose = "--verbose" in ARGS || true
+const FASTJET_DIR = get(ENV, "FASTJET_DIR", "")
+const prefix = Prefix(FASTJET_DIR == "" ? get([a for a in ARGS if a != "--verbose"], 1, joinpath(@__DIR__, "usr")) : FASTJET_DIR)
 products = [
     LibraryProduct(prefix, ["libfastjetwrap"], :libfastjetwrap),
 ]
@@ -20,22 +21,31 @@ download_info = Dict(
     Linux(:x86_64, libc=:glibc, compiler_abi=CompilerABI(:gcc8, :cxx11)) => ("$bin_prefix/FastJetWrapBuilder.v0.4.0.x86_64-linux-gnu-gcc8-cxx11.tar.gz", "7564fe12b520b2aa795ac45949b871420e51f82b7eacfb8a10c496b844be8474"),
 )
 
+transform_platform(platform) = typeof(platform)(platform.arch;libc=platform.libc,call_abi=platform.call_abi,compiler_abi=CompilerABI(max(platform.compiler_abi.gcc_version,:gcc7),:cxx11))
+transform_platform(platform::MacOS) = MacOS(:x86_64)
+
 # Install unsatisfied or updated dependencies:
 unsatisfied = any(!satisfied(p; verbose=verbose) for p in products)
-dl_info = choose_download(download_info, platform_key_abi())
-if dl_info === nothing && unsatisfied
-    # If we don't have a compatible .tar.gz to download, complain.
-    # Alternatively, you could attempt to install from a separate provider,
-    # build from source or something even more ambitious here.
-    error("Your platform (\"$(Sys.MACHINE)\", parsed as \"$(triplet(platform_key_abi()))\") is not supported by this package!")
+if FASTJET_DIR == ""
+    platform = transform_platform(platform_key_abi())
+    if haskey(download_info, platform)
+        url, tarball_hash = download_info[platform]
+        if unsatisfied || !isinstalled(url, tarball_hash; prefix=prefix)
+            # Download and install binaries
+            install(url, tarball_hash; prefix=prefix, force=true, verbose=verbose,ignore_platform=true)
+        end
+    elseif unsatisfied
+        # If we don't have a BinaryProvider-compatible .tar.gz to download, complain.
+        # Alternatively, you could attempt to install from a separate provider,
+        # build from source or something even more ambitious here.
+        error("Your platform $(triplet(platform)) is not supported by this package!")
+    end
+else
+    if unsatisfied
+        error("The required libraries were not found in the provided LCIO_DIR directory $LCIO_DIR")
+    end
 end
 
-# If we have a download, and we are unsatisfied (or the version we're
-# trying to install is not itself installed) then load it up!
-if unsatisfied || !isinstalled(dl_info...; prefix=prefix)
-    # Download and install binaries
-    install(dl_info...; prefix=prefix, force=true, verbose=verbose)
-end
 
 # Write out a deps.jl file that will contain mappings for our products
 write_deps_file(joinpath(@__DIR__, "deps.jl"), products, verbose=verbose)
