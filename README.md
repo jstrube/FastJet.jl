@@ -2,6 +2,7 @@
 Wrapper for using http://www.fastjet.fr/ in julia
 
 [![Build Status](https://travis-ci.com/jstrube/FastJet.jl.svg?branch=master)](https://travis-ci.com/jstrube/FastJet.jl)
+[![DOI](https://zenodo.org/badge/148918883.svg)](https://zenodo.org/badge/latestdoi/148918883)
 
 ## Building from source
 - Check out the binary distribution of FastJet from https://github.com/JuliaBinaryWrappers/Fastjet_jll.jl/releases
