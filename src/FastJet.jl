@@ -1,10 +1,7 @@
 module FastJet
+using FastJet_jll
 using CxxWrap
-const depsfile = joinpath(dirname(dirname(@__FILE__)), "deps", "deps.jl")
-if !isfile(depsfile)
-  error("$depsfile not found, CxxWrap did not build properly")
-end
-include(depsfile)
+using FastJet_Julia_Wrapper_jll
 
 @wrapmodule(libfastjetwrap)
 
