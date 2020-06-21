@@ -9,5 +9,5 @@ function __init__()
     @initcxx
 end
 
-export PseudoJet, JetDefinition, antikt_algorithm, ClusterSequence, inclusive_jets, sorted_by_pt, pt, px, py, pz, e, E, rap, phi, constituents
+export PseudoJet, JetDefinition, antikt_algorithm, ClusterSequence, inclusive_jets, sorted_by_pt, pt, px, py, pz, e, E, rap, phi, constituents, exclusive_jets
 end # module

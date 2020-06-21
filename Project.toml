@@ -1,7 +1,7 @@
 name = "FastJet"
 uuid = "8509a5d2-ae42-11e8-0b46-5d0ace601ee4"
 authors = ["Jan Strube <jan.strube@gmail.com>"]
-version = "0.6.0"
+version = "0.6.1"
 
 [deps]
 CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
@@ -13,7 +13,7 @@ FastJet_Julia_Wrapper_jll = "33ff6b16-4e4c-5b96-9396-f34816859298"
 CxxWrap = "0.11"
 julia = "1.4"
 FastJet_jll = "~3.3.4"
-FastJet_Julia_Wrapper_jll = "0.8"
+FastJet_Julia_Wrapper_jll = "0.8.1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

@@ -18,6 +18,8 @@ end
 
 # this is the example from http://www.fastjet.fr/quickstart.html
 function main()
+    vp = FastJet.ValenciaPlugin(1.2, 0.8)
+    vp_def = JetDefinition(vp)
     particles = PseudoJet[]
     # an event with 3 particles:  px    py   pz   E
     push!(particles, PseudoJet(  99.0,  0.1, 0, 100.0))
@@ -35,13 +37,16 @@ function main()
         printInfo(jets)
     end
     @testset "Plugins" begin
-        vp = FastJet.ValenciaPlugin(1.2, 0.8)
-        jet_def = JetDefinition(vp)
         # run the clustering, extract the jets
-        cs = ClusterSequence(StdVector(particles), jet_def)
+        cs = ClusterSequence(StdVector(particles), vp_def)
         jets = inclusive_jets(cs, 0.0)
         @test length(jets) == 2
         printInfo(jets)
+        # run the clustering, extract the jets
+        cs = ClusterSequence(StdVector(particles), vp_def)
+        jets = exclusive_jets(cs, 3)
+        printInfo(jets)
+        @test length(jets) == 3
     end
 end 
 main() 
