@@ -10,21 +10,22 @@ function printInfo(jets)
     for i = 1:length(jets)
         println("jet ", i, ": ", pt(jets[i]), " ", rap(jets[i]), " ", phi(jets[i]))
         constits = constituents(jets[i])
-        # for j = 1:length(constituents)
-        #     println("    constituent ", j, "'s pt: ", pt(constituents[j]))
-        # end
+        for j = 1:length(constits)
+            println("    constituent ", j, "'s pt: ", pt(constits[j]), " index ", user_index(constits[j]))
+        end
     end
 end
 
 # this is the example from http://www.fastjet.fr/quickstart.html
 function main()
-    vp = FastJet.ValenciaPlugin(1.2, 0.8)
-    vp_def = JetDefinition(vp)
     particles = PseudoJet[]
     # an event with 3 particles:  px    py   pz   E
     push!(particles, PseudoJet(  99.0,  0.1, 0, 100.0))
     push!(particles, PseudoJet(   4.0, -0.1, 0,   5.0))
     push!(particles, PseudoJet( -99.0,    0, 0,  99.0))
+    set_user_index(particles[1], 22)
+    set_user_index(particles[2], 24)
+    set_user_index(particles[3], 26)
   
     # choose a jet definition
     @testset "Core functionality" begin
@@ -35,18 +36,26 @@ function main()
         jets = inclusive_jets(cs, 0.0)
         @test length(jets) == 2
         printInfo(jets)
+        println(FastJet.will_delete_self_when_unused(cs))
     end
     @testset "Plugins" begin
         # run the clustering, extract the jets
-        cs = ClusterSequence(StdVector(particles), vp_def)
-        jets = inclusive_jets(cs, 0.0)
+        vp = FastJet.ValenciaPlugin(1.2, 0.8)
+        vp_def = JetDefinition(vp)
+        valencia = ClusterSequence(StdVector(particles), vp_def)
+        jets = inclusive_jets(valencia, 0.0)
         @test length(jets) == 2
         printInfo(jets)
         # run the clustering, extract the jets
         cs = ClusterSequence(StdVector(particles), vp_def)
-        jets = exclusive_jets(cs, 3)
+        jets = exclusive_jets(valencia, 3)
         printInfo(jets)
         @test length(jets) == 3
+        println(FastJet.will_delete_self_when_unused(valencia))
     end
+    p = PseudoJet(3.0, 4.0, 0.0, 25.0)
+    set_user_index(p, 17)
+    @test user_index(p) == 17
+    @test modp2(p) == 25.0
 end 
 main() 
