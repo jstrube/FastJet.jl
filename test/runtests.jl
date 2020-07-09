@@ -33,24 +33,29 @@ function main()
         jet_def = JetDefinition(antikt_algorithm, R)
         # run the clustering, extract the jets
         cs = ClusterSequence(StdVector(particles), jet_def)
-        jets = inclusive_jets(cs, 0.0)
-        @test length(jets) == 2
-        printInfo(jets)
-        println(FastJet.will_delete_self_when_unused(cs))
+        GC.@preserve cs begin
+            GC.gc()
+            jets = inclusive_jets(cs, 0.0)
+            @test length(jets) == 2
+            printInfo(jets)
+        end
     end
     @testset "Plugins" begin
         # run the clustering, extract the jets
         vp = FastJet.ValenciaPlugin(1.2, 0.8)
         vp_def = JetDefinition(vp)
         valencia = ClusterSequence(StdVector(particles), vp_def)
-        jets = inclusive_jets(valencia, 0.0)
-        @test length(jets) == 2
-        printInfo(jets)
-        # run the clustering, extract the jets
-        cs = ClusterSequence(StdVector(particles), vp_def)
-        jets = exclusive_jets(valencia, 3)
-        printInfo(jets)
-        @test length(jets) == 3
+        GC.@preserve vp valencia vp_def begin
+            jets = inclusive_jets(valencia, 0.0)
+            GC.gc()
+            @test length(jets) == 2
+            printInfo(jets)
+            # run the clustering, extract the jets
+            cs = ClusterSequence(StdVector(particles), vp_def)            
+            jets = exclusive_jets(valencia, 3)
+            printInfo(jets)
+            @test length(jets) == 3
+        end
         println(FastJet.will_delete_self_when_unused(valencia))
     end
     p = PseudoJet(3.0, 4.0, 0.0, 25.0)
