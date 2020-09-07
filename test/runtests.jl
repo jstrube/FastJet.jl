@@ -38,6 +38,8 @@ function main()
             jets = inclusive_jets(cs, 0.0)
             @test length(jets) == 2
             printInfo(jets)
+            println(FastJet.four_mom(jets[1]))
+            println(FastJet.four_mom(jets[2]))
         end
     end
     @testset "Plugins" begin
@@ -59,6 +61,15 @@ function main()
         println(FastJet.will_delete_self_when_unused(valencia))
     end
     p = PseudoJet(3.0, 4.0, 0.0, 25.0)
+    mom = FastJet.four_mom(p)
+    @test mom[1] == px(p)
+    @test mom[2] == py(p)
+    @test mom[3] == pz(p)
+    @test mom[4] == E(p)
+    @test p[1] == px(p)
+    @test p[2] == py(p)
+    @test p[3] == pz(p)
+    @test p[4] == E(p)
     set_user_index(p, 17)
     @test user_index(p) == 17
     @test modp2(p) == 25.0
