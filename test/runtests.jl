@@ -28,7 +28,7 @@ function main()
     set_user_index(particles[3], 26)
   
     # choose a jet definition
-    @testset "Core functionality" begin
+    @testset "Core functionality -- antikt" begin
         R = 0.7
         jet_def = JetDefinition(antikt_algorithm, R)
         # run the clustering, extract the jets
@@ -36,6 +36,35 @@ function main()
         GC.@preserve cs begin
             GC.gc()
             jets = inclusive_jets(cs, 0.0)
+            @test length(jets) == 2
+            printInfo(jets)
+            println(FastJet.four_mom(jets[1]))
+            println(FastJet.four_mom(jets[2]))
+        end
+    end
+    # choose a jet definition
+    @testset "Core functionality -- ee_gen_kt" begin
+        R = 4.0
+        p = 1.0 # generalized algorithm: p=1: kt; p=-1: anti-kt; p=0: Cambridge
+        jet_def = JetDefinition(FastJet.ee_genkt_algorithm, R, p)
+        # run the clustering, extract the jets
+        cs = ClusterSequence(StdVector(particles), jet_def)
+        GC.@preserve cs begin
+            GC.gc()
+            jets = exclusive_jets(cs, 2)
+            @test length(jets) == 2
+            printInfo(jets)
+            println(FastJet.four_mom(jets[1]))
+            println(FastJet.four_mom(jets[2]))
+        end
+    end
+    @testset "Core functionality -- Durham" begin
+        jet_def = JetDefinition(FastJet.ee_kt_algorithm)
+        # run the clustering, extract the jets
+        cs = ClusterSequence(StdVector(particles), jet_def)
+        GC.@preserve cs begin
+            GC.gc()
+            jets = exclusive_jets(cs, 2)
             @test length(jets) == 2
             printInfo(jets)
             println(FastJet.four_mom(jets[1]))
